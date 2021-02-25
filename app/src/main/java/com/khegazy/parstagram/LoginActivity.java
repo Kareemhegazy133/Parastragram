@@ -17,6 +17,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.parse.LogInCallback;
 import com.parse.ParseException;
 import com.parse.ParseUser;
+import com.parse.SignUpCallback;
 
 // A Login Screen that offers login via username/password
 public class LoginActivity extends AppCompatActivity {
@@ -25,6 +26,7 @@ public class LoginActivity extends AppCompatActivity {
     private EditText etUsername;
     private EditText etPassword;
     private Button btnLogin;
+    private Button btnSignUp;
     private CheckBox chkBoxSaveLogIn;
     private SharedPreferences loginPreferences;
     private SharedPreferences.Editor loginPrefsEditor;
@@ -41,6 +43,7 @@ public class LoginActivity extends AppCompatActivity {
         if(ParseUser.getCurrentUser() != null){
             goMainActivity();
         }
+
         etUsername = findViewById(R.id.etUsername);
         etPassword = findViewById(R.id.etPassword);
         chkBoxSaveLogIn = findViewById(R.id.chkBoxSaveLogIn);
@@ -74,6 +77,44 @@ public class LoginActivity extends AppCompatActivity {
                 }
 
                 loginUser(username, password);
+            }
+        });
+
+        btnSignUp = findViewById(R.id.btnSignUp);
+        btnSignUp.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.i(TAG, "onClick login button");
+                signUpUser();
+            }
+        });
+    }
+
+    private void signUpUser() {
+        // Create the ParseUser
+        ParseUser user = new ParseUser();
+        // Set core properties
+        user.setUsername(etUsername.getText().toString());
+        user.setPassword(etPassword.getText().toString());
+        //user.setEmail("email@example.com");
+        // Set custom properties
+        //user.put("phone", "650-253-0000");
+        // Invoke signUpInBackground
+        user.signUpInBackground(new SignUpCallback() {
+            public void done(ParseException e) {
+                if (e == null) {
+                    // Hooray! Let them use the app now.
+                    goMainActivity();
+                    Toast.makeText(LoginActivity.this, "You have successfully created your account!", Toast.LENGTH_SHORT).show();
+                } else {
+                    // Sign up didn't succeed. Look at the ParseException
+                    // to figure out what went wrong
+
+                    //TODO: better error handling
+                    Log.e(TAG, "Issue with login", e);
+                    Toast.makeText(LoginActivity.this, "Issue with Signup!", Toast.LENGTH_SHORT).show();
+                    return;
+                }
             }
         });
     }
